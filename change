@@ -1,0 +1,81 @@
+#!/usr/bin/perl
+use strict;
+use lib './lib';
+
+use Money::ChangeMaker;
+
+main();
+
+sub main {
+
+    my $total = getTotalAmt();
+    my $paid  = getPaidAmt();
+    my $changemake = new Money::ChangeMaker;
+    $changemake->denominations($changemake->get_preset('USA'));
+   
+    if($total > $paid) {
+        print STDERR "Paid amount is less than total, try again.\n";
+	exit(0);
+    } elsif($total == $paid) {
+        print "Exact payment given, no change.\n";
+	exit(0);
+    }
+
+    my $result;
+    my $error;
+
+    eval {
+        $result = $changemake->make_change($total, $paid);
+    };
+
+    if($error) {
+        print STDERR $error . "\n";
+    } else {
+        print "Your change is:\n$result\n";
+    }
+
+    exit(0);
+}
+
+sub getTotalAmt {
+    while(1) {
+        centsMessage();
+	print "Total: ";
+	my $input = <STDIN>;
+	chomp($input);
+
+	if(validateInput($input)) {
+	    return($input);
+	}	
+    }
+}
+
+sub getPaidAmt {
+    while(1) {
+        centsMessage();
+	print "Paid: ";
+	my $input = <STDIN>;
+	chomp($input);
+
+	if(validateInput($input)) {
+	    return($input);
+	}	
+    }
+
+}
+
+sub validateInput {
+    my $input = shift;
+    if($input =~ /\d+/) {
+        return(1);
+    } elsif($input =~ /^[qQ]$/) {
+        exit(0);
+    } else {
+         print STDERR "Invalid input, only numbers or 'q' for quit accepted.\n";
+	 return(0);
+    }
+}
+
+sub centsMessage {
+    print "Last two digits are considered cents digits. Enter 'q' to quit.\n";
+}
