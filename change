@@ -22,17 +22,10 @@ sub main {
     }
 
     my $result;
-    my $error;
 
-    eval {
-        $result = $changemake->make_change($total, $paid);
-    };
+    $result = $changemake->make_change($total, $paid);
 
-    if($error) {
-        print STDERR $error . "\n";
-    } else {
-        print "Your change is:\n$result\n";
-    }
+    print "Your change is:\n$result\n";
 
     exit(0);
 }
